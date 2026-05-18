@@ -36,9 +36,19 @@ services:
       start_period: 30s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.obbyircd.rule=Host(`${IRC_FQDN}`)
-      - traefik.http.routers.obbyircd.tls=true
-      - traefik.http.services.obbyircd.loadbalancer.server.port=8080
+      # WSS rides the same host as the API.  Traefik sees the
+      # Upgrade: websocket header and routes those requests here;
+      # everything else on the same host falls through to obby-api
+      # via its own router (longer rule + explicit priority wins).
+      # On Coolify, SERVICE_FQDN_OBBY_API expands to the obby-api
+      # FQDN before label escaping; raw docker-compose users can
+      # set API_FQDN in .env and it works the same way.
+      - 'traefik.http.routers.obbyircd-ws.rule=Host(`${SERVICE_FQDN_OBBY_API:-${API_FQDN}}`) && HeaderRegexp(`Upgrade`, `websocket`)'
+      - traefik.http.routers.obbyircd-ws.entryPoints=https
+      - traefik.http.routers.obbyircd-ws.tls=true
+      - traefik.http.routers.obbyircd-ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.obbyircd-ws.priority=100
+      - traefik.http.services.obbyircd-ws.loadbalancer.server.port=8080
 
   obby-api:
     image: ${OBBY_API_IMAGE:-mattfly/obby-api:latest}
