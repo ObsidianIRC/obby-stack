@@ -43,9 +43,19 @@ Set `COMPOSE_PROFILES=frontend` in `.env` to make `frontend` the default.
 
 ## Volumes
 
-Named volumes by default. Set the `*_BIND` env vars to absolute host
-paths to use bind mounts instead — convenient for off-host backups
-and known-location config edits. See `.env.example`.
+Bind-mounted under `/data/obby/` by default. Override per-path with
+the `*_BIND` env vars. See `.env.example`.
+
+## Extending the IRCd
+
+Drop files in the matching host dir; they're picked up on next restart
+(`docker compose restart obbyircd`).
+
+| Type | Host path | In-container | Loaded by |
+|------|-----------|--------------|-----------|
+| Native C `.c` module | `/data/obby/custom-modules/` | `/home/obbyircd/obby/custom-modules` | compiled to `third/<name>.so` and `loadmodule`-d automatically |
+| Server-side JS `.js` | `/data/obby/scripts/` | `conf/scripts` | `obbyscript` (scans dir at boot) |
+| Server-side Python `.py` | `/data/obby/scripts/python/` | `conf/scripts/python` | `obbypy` (scans dir at boot) |
 
 ## Updating
 

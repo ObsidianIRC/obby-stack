@@ -21,6 +21,7 @@ services:
       - ${LOGS_BIND:-/data/obby/logs}:/home/obbyircd/obby/logs
       - ${TLS_BIND:-/data/obby/tls}:/home/obbyircd/obby/tls
       - ${CUSTOM_MODULES_BIND:-/data/obby/custom-modules}:/home/obbyircd/obby/custom-modules
+      - ${SCRIPTS_BIND:-/data/obby/scripts}:/home/obbyircd/obby/conf/scripts
       - ${VOICE_BRIDGE_BIND:-/data/obby/voice-bridge}:/run/obbyirc
     environment:
       WS_PORT: "${WS_PORT:-8080}"
