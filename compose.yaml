@@ -3,10 +3,9 @@
 #   docker compose up -d                       # IRC + backend
 #   docker compose --profile frontend up -d    # + web client
 #
-# All persistent state lives under OBBY_DATA_ROOT (defaults to ./data
-# next to the compose file).  Drop your TLS cert at
-# $OBBY_DATA_ROOT/tls/server.{cert,key}.pem; everything else is wired
-# from .env.
+# All persistent state lives under /data/obby/ (override per-path with
+# the *_BIND env vars).  Drop your TLS cert into /data/obby/tls/
+# server.{cert,key}.pem; everything else is wired from .env.
 
 services:
   obbyircd:
@@ -17,12 +16,12 @@ services:
     ports:
       - "${SSL_HOST_PORT:-6697}:${SSL_PORT:-6697}"
     volumes:
-      - ${CONF_BIND:-./data/conf}:/home/obbyircd/obby/conf
-      - ${DATA_BIND:-./data/data}:/home/obbyircd/obby/data
-      - ${LOGS_BIND:-./data/logs}:/home/obbyircd/obby/logs
-      - ${TLS_BIND:-./data/tls}:/home/obbyircd/obby/tls
-      - ${CUSTOM_MODULES_BIND:-./data/custom-modules}:/home/obbyircd/obby/custom-modules
-      - ${VOICE_BRIDGE_BIND:-./data/voice-bridge}:/run/obbyirc
+      - ${CONF_BIND:-/data/obby/conf}:/home/obbyircd/obby/conf
+      - ${DATA_BIND:-/data/obby/data}:/home/obbyircd/obby/data
+      - ${LOGS_BIND:-/data/obby/logs}:/home/obbyircd/obby/logs
+      - ${TLS_BIND:-/data/obby/tls}:/home/obbyircd/obby/tls
+      - ${CUSTOM_MODULES_BIND:-/data/obby/custom-modules}:/home/obbyircd/obby/custom-modules
+      - ${VOICE_BRIDGE_BIND:-/data/obby/voice-bridge}:/run/obbyirc
     environment:
       WS_PORT: "${WS_PORT:-8080}"
       SSL_PORT: "${SSL_PORT:-6697}"
@@ -59,9 +58,9 @@ services:
     ports:
       - "${TURN_PORT:-3478}:3478/udp"
     volumes:
-      - ${OBBY_API_DATA_BIND:-./data/api-data}:/app/data
-      - ${OBBY_API_IMAGES_BIND:-./data/api-images}:/app/images
-      - ${VOICE_BRIDGE_BIND:-./data/voice-bridge}:/run/obbyirc
+      - ${OBBY_API_DATA_BIND:-/data/obby/api-data}:/app/data
+      - ${OBBY_API_IMAGES_BIND:-/data/obby/api-images}:/app/images
+      - ${VOICE_BRIDGE_BIND:-/data/obby/voice-bridge}:/run/obbyirc
     environment:
       PORT: "8080"
       VOICE_BRIDGE_SOCKET: /run/obbyirc/voice.sock
