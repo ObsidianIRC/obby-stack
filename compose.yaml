@@ -1,10 +1,12 @@
-# Obby full stack -- all images pulled from Dockerhub.
+# Obby full stack.
 #
 #   docker compose up -d                       # IRC + backend
 #   docker compose --profile frontend up -d    # + web client
 #
-# This file does not build anything.  For source-built dev stacks
-# see the respective service repos.
+# All persistent state lives under OBBY_DATA_ROOT (defaults to ./data
+# next to the compose file).  Drop your TLS cert at
+# $OBBY_DATA_ROOT/tls/server.{cert,key}.pem; everything else is wired
+# from .env.
 
 services:
   obbyircd:
@@ -15,12 +17,12 @@ services:
     ports:
       - "${SSL_HOST_PORT:-6697}:${SSL_PORT:-6697}"
     volumes:
-      - ${CONF_BIND:-obbyircd_conf}:/home/obbyircd/obby/conf
-      - ${DATA_BIND:-obbyircd_data}:/home/obbyircd/obby/data
-      - ${LOGS_BIND:-obbyircd_logs}:/home/obbyircd/obby/logs
-      - ${TLS_BIND:-obbyircd_tls}:/home/obbyircd/obby/tls
-      - ${CUSTOM_MODULES_BIND:-obbyircd_custom_modules}:/home/obbyircd/obby/custom-modules
-      - ${VOICE_BRIDGE_BIND:-obbyircd_voice_bridge}:/run/obbyirc
+      - ${CONF_BIND:-${OBBY_DATA_ROOT:-./data}/conf}:/home/obbyircd/obby/conf
+      - ${DATA_BIND:-${OBBY_DATA_ROOT:-./data}/data}:/home/obbyircd/obby/data
+      - ${LOGS_BIND:-${OBBY_DATA_ROOT:-./data}/logs}:/home/obbyircd/obby/logs
+      - ${TLS_BIND:-${OBBY_DATA_ROOT:-./data}/tls}:/home/obbyircd/obby/tls
+      - ${CUSTOM_MODULES_BIND:-${OBBY_DATA_ROOT:-./data}/custom-modules}:/home/obbyircd/obby/custom-modules
+      - ${VOICE_BRIDGE_BIND:-${OBBY_DATA_ROOT:-./data}/voice-bridge}:/run/obbyirc
     environment:
       WS_PORT: "${WS_PORT:-8080}"
       SSL_PORT: "${SSL_PORT:-6697}"
@@ -57,9 +59,9 @@ services:
     ports:
       - "${TURN_PORT:-3478}:3478/udp"
     volumes:
-      - ${OBBY_API_DATA_BIND:-obby_api_data}:/app/data
-      - ${OBBY_API_IMAGES_BIND:-obby_api_images}:/app/images
-      - ${VOICE_BRIDGE_BIND:-obbyircd_voice_bridge}:/run/obbyirc
+      - ${OBBY_API_DATA_BIND:-${OBBY_DATA_ROOT:-./data}/api-data}:/app/data
+      - ${OBBY_API_IMAGES_BIND:-${OBBY_DATA_ROOT:-./data}/api-images}:/app/images
+      - ${VOICE_BRIDGE_BIND:-${OBBY_DATA_ROOT:-./data}/voice-bridge}:/run/obbyirc
     environment:
       PORT: "8080"
       VOICE_BRIDGE_SOCKET: /run/obbyirc/voice.sock
@@ -97,13 +99,3 @@ services:
       - traefik.http.routers.web.rule=Host(`${WEB_FQDN}`)
       - traefik.http.routers.web.tls=true
       - traefik.http.services.web.loadbalancer.server.port=80
-
-volumes:
-  obbyircd_conf:
-  obbyircd_data:
-  obbyircd_logs:
-  obbyircd_tls:
-  obbyircd_custom_modules:
-  obbyircd_voice_bridge:
-  obby_api_data:
-  obby_api_images:
