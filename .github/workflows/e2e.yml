@@ -1,0 +1,27 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [install, autoload]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -e tests/e2e
+
+      - run: pytest -v tests/e2e/test_${{ matrix.suite }}.py
+        env:
+          DOCKER_BUILDKIT: "1"

@@ -1,0 +1,17 @@
+[project]
+name = "obby-e2e"
+version = "0"
+requires-python = ">=3.11"
+dependencies = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",
+]
+
+[tool.setuptools]
+packages = ["lib"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["."]
+addopts = "-ra --tb=short"
