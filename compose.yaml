@@ -9,7 +9,6 @@
 services:
   obbyircd:
     image: ${OBBYIRCD_IMAGE:-mattfly/obbyircd:latest}
-    container_name: obbyircd
     restart: unless-stopped
     expose:
       - "8080"
@@ -43,7 +42,6 @@ services:
 
   obby-api:
     image: ${OBBY_API_IMAGE:-mattfly/obby-api:latest}
-    container_name: obby-api
     restart: unless-stopped
     depends_on:
       obbyircd:
@@ -81,7 +79,6 @@ services:
 
   obby:
     image: ${OBBY_WEB_IMAGE:-mattfly/obby:latest}
-    container_name: obby-web
     restart: unless-stopped
     profiles: ["frontend"]
     expose:
