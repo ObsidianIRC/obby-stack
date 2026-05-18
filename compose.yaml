@@ -36,12 +36,9 @@ services:
       start_period: 30s
     labels:
       - traefik.enable=true
-      # IRC websocket on its own subdomain.
       - traefik.http.routers.obbyircd.rule=Host(`${IRC_FQDN}`)
       - traefik.http.routers.obbyircd.tls=true
       - traefik.http.services.obbyircd.loadbalancer.server.port=8080
-      # IRC websocket on the API host (WSS upgrade requests only).
-      # Longer rule + priority 100 wins over obby-api's catch-all.
       - traefik.http.routers.obbyircd-ws.rule=Host(`${API_FQDN}`) && HeaderRegexp(`Upgrade`,`websocket`)
       - traefik.http.routers.obbyircd-ws.tls=true
       - traefik.http.routers.obbyircd-ws.priority=100
