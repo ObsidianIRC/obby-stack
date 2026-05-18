@@ -1,0 +1,106 @@
+# Obby full stack -- all images pulled from Dockerhub.
+#
+#   docker compose up -d                       # IRC + backend
+#   docker compose --profile frontend up -d    # + web client
+#
+# This file does not build anything.  For source-built dev stacks
+# see the respective service repos.
+
+services:
+  obbyircd:
+    image: ${OBBYIRCD_IMAGE:-mattfly/obbyircd:latest}
+    container_name: obbyircd
+    restart: unless-stopped
+    expose:
+      - "8080"
+    ports:
+      - "${SSL_HOST_PORT:-6697}:${SSL_PORT:-6697}"
+    volumes:
+      - ${CONF_BIND:-obbyircd_conf}:/home/obbyircd/obby/conf
+      - ${DATA_BIND:-obbyircd_data}:/home/obbyircd/obby/data
+      - ${LOGS_BIND:-obbyircd_logs}:/home/obbyircd/obby/logs
+      - ${TLS_BIND:-obbyircd_tls}:/home/obbyircd/obby/tls
+      - ${CUSTOM_MODULES_BIND:-obbyircd_custom_modules}:/home/obbyircd/obby/custom-modules
+      - ${VOICE_BRIDGE_BIND:-obbyircd_voice_bridge}:/run/obbyirc
+    environment:
+      WS_PORT: "${WS_PORT:-8080}"
+      SSL_PORT: "${SSL_PORT:-6697}"
+      VOICE_BRIDGE_SOCKET: /run/obbyirc/voice.sock
+    env_file:
+      - path: .env
+        required: false
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost ${WS_PORT:-8080}"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.obbyircd.rule=Host(`${IRC_FQDN}`)
+      - traefik.http.routers.obbyircd.tls=true
+      - traefik.http.services.obbyircd.loadbalancer.server.port=8080
+
+  obby-api:
+    image: ${OBBY_API_IMAGE:-mattfly/obby-api:latest}
+    container_name: obby-api
+    restart: unless-stopped
+    depends_on:
+      obbyircd:
+        condition: service_healthy
+    expose:
+      - "8080"
+    ports:
+      - "${TURN_PORT:-3478}:3478/udp"
+    volumes:
+      - ${OBBY_API_DATA_BIND:-obby_api_data}:/app/data
+      - ${OBBY_API_IMAGES_BIND:-obby_api_images}:/app/images
+      - ${VOICE_BRIDGE_BIND:-obbyircd_voice_bridge}:/run/obbyirc
+    environment:
+      PORT: "8080"
+      VOICE_BRIDGE_SOCKET: /run/obbyirc/voice.sock
+      VOICE_TURN_SECRET: ${VOICE_TURN_SECRET}
+      VOICE_PUBLIC_IP: ${VOICE_PUBLIC_IP}
+      VOICE_TURN_PORT: "${TURN_PORT:-3478}"
+      VOICE_TURN_REALM: ${VOICE_TURN_REALM:-obby}
+      VOICE_MAX_ROOM: "${VOICE_MAX_ROOM:-25}"
+      JWT_SECRET: ${JWT_SECRET}
+      IRC_SERVER_KEY: ${IRC_SERVER_KEY}
+      UNREALIRCD_WS_URL: ${UNREALIRCD_WS_URL:-ws://obbyircd:8080}
+      UNREALIRCD_API_USERNAME: ${UNREALIRCD_API_USERNAME:-admin}
+      UNREALIRCD_API_PASSWORD: ${RPC_PASSWORD}
+      FILEHOST_PUBLIC_URL: ${FILEHOST_PUBLIC_URL}
+    env_file:
+      - path: .env
+        required: false
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.api.rule=Host(`${API_FQDN}`)
+      - traefik.http.routers.api.tls=true
+      - traefik.http.services.api.loadbalancer.server.port=8080
+
+  obby:
+    image: ${OBBY_WEB_IMAGE:-mattfly/obby:latest}
+    container_name: obby-web
+    restart: unless-stopped
+    profiles: ["frontend"]
+    expose:
+      - "80"
+    env_file:
+      - path: .env
+        required: false
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.web.rule=Host(`${WEB_FQDN}`)
+      - traefik.http.routers.web.tls=true
+      - traefik.http.services.web.loadbalancer.server.port=80
+
+volumes:
+  obbyircd_conf:
+  obbyircd_data:
+  obbyircd_logs:
+  obbyircd_tls:
+  obbyircd_custom_modules:
+  obbyircd_voice_bridge:
+  obby_api_data:
+  obby_api_images:

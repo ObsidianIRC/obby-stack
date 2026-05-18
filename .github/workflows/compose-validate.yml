@@ -1,0 +1,37 @@
+name: Validate compose
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: docker compose config (default)
+        env:
+          IRC_FQDN: irc.example.com
+          API_FQDN: api.example.com
+          WEB_FQDN: chat.example.com
+          VOICE_PUBLIC_IP: 1.2.3.4
+          VOICE_TURN_SECRET: x
+          JWT_SECRET: x
+          IRC_SERVER_KEY: x
+          RPC_PASSWORD: x
+        run: docker compose config --quiet
+      - name: docker compose config (frontend profile)
+        env:
+          IRC_FQDN: irc.example.com
+          API_FQDN: api.example.com
+          WEB_FQDN: chat.example.com
+          VOICE_PUBLIC_IP: 1.2.3.4
+          VOICE_TURN_SECRET: x
+          JWT_SECRET: x
+          IRC_SERVER_KEY: x
+          RPC_PASSWORD: x
+          COMPOSE_PROFILES: frontend
+        run: docker compose config --quiet
