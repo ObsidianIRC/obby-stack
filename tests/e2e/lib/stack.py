@@ -1,3 +1,4 @@
+import json
 import os
 import secrets
 import shutil
@@ -120,10 +121,21 @@ class ComposeStack:
         deadline = time.time() + timeout
         while time.time() < deadline:
             r = self._compose("ps", "--format", "json", service, capture=True)
-            if "healthy" in r.stdout:
-                return
+            for line in r.stdout.splitlines():
+                if not line.strip():
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if entry.get("Health") == "healthy":
+                    return
             time.sleep(1)
         raise TimeoutError(f"{service} never became healthy: {self.logs(service)[-2000:]}")
+
+    def read_container_file(self, service: str, path: str) -> str:
+        r = self._compose("exec", "-T", service, "cat", path, capture=True)
+        return r.stdout
 
     def wait_log(self, service: str, needle: str, timeout=30):
         deadline = time.time() + timeout
