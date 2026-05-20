@@ -2,7 +2,6 @@ import json
 import os
 import secrets
 import shutil
-import string
 import subprocess
 import tempfile
 import time
@@ -12,17 +11,11 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 COMPOSE_FILE = REPO_ROOT / "compose.yaml"
 COMPOSE_OVERRIDE = Path(__file__).resolve().parent.parent / "compose.override.yaml"
 
-ALNUM = string.ascii_letters + string.digits
-
 _BIND_DIRS = (
     "conf", "data", "logs", "tls",
     "custom-modules", "scripts", "scripts/python",
     "voice-bridge", "api-data", "api-images",
 )
-
-
-def _cloak():
-    return "".join(secrets.choice(ALNUM) for _ in range(96))
 
 
 class ComposeStack:
@@ -39,7 +32,13 @@ class ComposeStack:
                 dst = self.data_root / sub.name
                 if sub.is_dir():
                     shutil.copytree(sub, dst, dirs_exist_ok=True)
+        self.env_file = self.data_root / "test.env"
         self.env = self._build_env(env_overrides or {})
+        self._write_env_file()
+
+    def _write_env_file(self):
+        lines = [f"{k}={v}" for k, v in self.env.items() if k != "COMPOSE_PROJECT_NAME"]
+        self.env_file.write_text("\n".join(lines) + "\n")
 
     def _build_env(self, overrides):
         env = {
@@ -66,9 +65,6 @@ class ComposeStack:
             "VOICE_TURN_REALM": "test",
             "VOICE_MAX_ROOM": "5",
             "UNREALIRCD_API_USERNAME": "admin",
-            "CLOAK_KEY1": _cloak(),
-            "CLOAK_KEY2": _cloak(),
-            "CLOAK_KEY3": _cloak(),
             "CONF_BIND": str(self.data_root / "conf"),
             "DATA_BIND": str(self.data_root / "data"),
             "LOGS_BIND": str(self.data_root / "logs"),
@@ -89,7 +85,7 @@ class ComposeStack:
             "-f", str(COMPOSE_OVERRIDE),
             *args,
         ]
-        full_env = {**os.environ, **self.env}
+        full_env = {**os.environ, **self.env, "E2E_ENV_FILE": str(self.env_file)}
         return subprocess.run(
             cmd, env=full_env, check=check, text=True,
             capture_output=capture,

@@ -1,19 +1,8 @@
 services:
   obbyircd:
-    env_file: !reset []
-    environment:
-      SERVER_NAME: ${SERVER_NAME}
-      NETWORK_NAME: ${NETWORK_NAME}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      MOTD_TEXT: ${MOTD_TEXT}
-      OPER_NAME: ${OPER_NAME}
-      OPER_PASSWORD: ${OPER_PASSWORD}
-      RPC_PASSWORD: ${RPC_PASSWORD}
-      FILEHOST_URL: ${FILEHOST_URL}
-      API_FQDN: ${API_FQDN}
-      CLOAK_KEY1: ${CLOAK_KEY1}
-      CLOAK_KEY2: ${CLOAK_KEY2}
-      CLOAK_KEY3: ${CLOAK_KEY3}
+    env_file: !override
+      - path: ${E2E_ENV_FILE}
+        required: true
     ports: !override
       - "127.0.0.1::6697"
       - "127.0.0.1::8080"
@@ -21,18 +10,8 @@ services:
     healthcheck:
       start_period: 5s
   obby-api:
-    env_file: !reset []
-    environment:
-      PORT: "8080"
-      JWT_SECRET: ${JWT_SECRET}
-      IRC_SERVER_KEY: ${IRC_SERVER_KEY}
-      UNREALIRCD_API_USERNAME: ${UNREALIRCD_API_USERNAME}
-      UNREALIRCD_API_PASSWORD: ${RPC_PASSWORD}
-      VOICE_TURN_SECRET: ${VOICE_TURN_SECRET}
-      VOICE_PUBLIC_IP: ${VOICE_PUBLIC_IP}
-      VOICE_TURN_PORT: ${TURN_PORT}
-      VOICE_TURN_REALM: ${VOICE_TURN_REALM}
-      VOICE_MAX_ROOM: ${VOICE_MAX_ROOM}
-      FILEHOST_PUBLIC_URL: ${FILEHOST_PUBLIC_URL}
+    env_file: !override
+      - path: ${E2E_ENV_FILE}
+        required: true
     ports: !reset []
     labels: !reset []
