@@ -9,7 +9,7 @@
 
 services:
   obbyircd:
-    image: ${OBBYIRCD_IMAGE:-mattfly/obbyircd:sha-${OBBYIRCD_VERSION:-00d64c0}}
+    image: ${OBBYIRCD_IMAGE:-mattfly/obbyircd:sha-${OBBYIRCD_VERSION:-2536630}}
     restart: unless-stopped
     expose:
       - "8080"
