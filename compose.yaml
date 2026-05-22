@@ -61,6 +61,7 @@ services:
       - "8080"
     ports:
       - "${TURN_PORT:-3478}:3478/udp"
+      - "${VOICE_WEBRTC_PORT_MIN:-50000}-${VOICE_WEBRTC_PORT_MAX:-50100}:${VOICE_WEBRTC_PORT_MIN:-50000}-${VOICE_WEBRTC_PORT_MAX:-50100}/udp"
     volumes:
       - ${OBBY_API_DATA_BIND:-/data/obby/api-data}:/app/data
       - ${OBBY_API_IMAGES_BIND:-/data/obby/api-images}:/app/images
@@ -80,6 +81,8 @@ services:
       UNREALIRCD_API_PASSWORD: ${RPC_PASSWORD}
       FILEHOST_PUBLIC_URL: ${FILEHOST_PUBLIC_URL}
       VOICE_TURN_DISABLE_EMBEDDED: ${VOICE_TURN_DISABLE_EMBEDDED:-}
+      VOICE_WEBRTC_PORT_MIN: "${VOICE_WEBRTC_PORT_MIN:-50000}"
+      VOICE_WEBRTC_PORT_MAX: "${VOICE_WEBRTC_PORT_MAX:-50100}"
     env_file:
       - path: .env
         required: false
