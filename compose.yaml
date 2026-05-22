@@ -27,6 +27,9 @@ services:
       WS_PORT: "${WS_PORT:-8080}"
       SSL_PORT: "${SSL_PORT:-6697}"
       VOICE_BRIDGE_SOCKET: /run/obbyirc/voice.sock
+      VOICE_TURN_EXTERNAL_URLS: ${VOICE_TURN_EXTERNAL_URLS:-}
+      VOICE_TURN_SHARED_SECRET: ${VOICE_TURN_SHARED_SECRET:-}
+      VOICE_TURN_TTL: ${VOICE_TURN_TTL:-}
     env_file:
       - path: .env
         required: false
@@ -76,6 +79,7 @@ services:
       UNREALIRCD_API_USERNAME: ${UNREALIRCD_API_USERNAME:-admin}
       UNREALIRCD_API_PASSWORD: ${RPC_PASSWORD}
       FILEHOST_PUBLIC_URL: ${FILEHOST_PUBLIC_URL}
+      VOICE_TURN_DISABLE_EMBEDDED: ${VOICE_TURN_DISABLE_EMBEDDED:-}
     env_file:
       - path: .env
         required: false
