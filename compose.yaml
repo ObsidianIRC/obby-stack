@@ -9,7 +9,7 @@
 
 services:
   obbyircd:
-    image: ${OBBYIRCD_IMAGE:-mattfly/obbyircd:sha-${OBBYIRCD_VERSION:-2536630}}
+    image: ${OBBYIRCD_IMAGE:-obbyirc/obbyircd:sha-${OBBYIRCD_VERSION:-2536630}}
     restart: unless-stopped
     expose:
       - "8080"
@@ -52,7 +52,7 @@ services:
       - traefik.http.services.obbyircd-ws.loadbalancer.server.port=8080
 
   obby-api:
-    image: ${OBBY_API_IMAGE:-mattfly/obby-api:sha-${OBBY_API_VERSION:-e0ccb1b}}
+    image: ${OBBY_API_IMAGE:-obbyirc/obby-api:sha-${OBBY_API_VERSION:-e0ccb1b}}
     restart: unless-stopped
     depends_on:
       obbyircd:
@@ -93,7 +93,7 @@ services:
       - traefik.http.services.api.loadbalancer.server.port=8080
 
   obby:
-    image: ${OBBY_WEB_IMAGE:-mattfly/obby:${OBBY_WEB_VERSION:-5e4181b3e51b4645b9b39e55ba10deb8f42e2793}}
+    image: ${OBBY_WEB_IMAGE:-obbyirc/obby:${OBBY_WEB_VERSION:-5e4181b3e51b4645b9b39e55ba10deb8f42e2793}}
     restart: unless-stopped
     profiles: ["frontend"]
     expose:

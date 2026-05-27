@@ -8,9 +8,9 @@ from Dockerhub. The Dockerfiles live in their per-service repos:
 
 | Image | Source repo |
 |-------|-------------|
-| `mattfly/obbyircd` | [ObsidianIRC/ObbyIRCd](https://github.com/ObsidianIRC/ObbyIRCd) |
-| `mattfly/obby-api` | [ObsidianIRC/hosted-backend](https://github.com/ObsidianIRC/hosted-backend) |
-| `mattfly/obby` | [ObsidianIRC/ObsidianIRC](https://github.com/ObsidianIRC/ObsidianIRC) |
+| `obbyirc/obbyircd` | [ObsidianIRC/ObbyIRCd](https://github.com/ObsidianIRC/ObbyIRCd) |
+| `obbyirc/obby-api` | [ObsidianIRC/hosted-backend](https://github.com/ObsidianIRC/hosted-backend) |
+| `obbyirc/obby` | [ObsidianIRC/ObsidianIRC](https://github.com/ObsidianIRC/ObsidianIRC) |
 
 For Kubernetes / Helm, see [obby-helm](https://github.com/ObsidianIRC/obby-helm).
 
