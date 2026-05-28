@@ -11,6 +11,7 @@ from Dockerhub. The Dockerfiles live in their per-service repos:
 | `obbyirc/obbyircd` | [ObsidianIRC/ObbyIRCd](https://github.com/ObsidianIRC/ObbyIRCd) |
 | `obbyirc/obby-api` | [ObsidianIRC/hosted-backend](https://github.com/ObsidianIRC/hosted-backend) |
 | `obbyirc/obby` | [ObsidianIRC/ObsidianIRC](https://github.com/ObsidianIRC/ObsidianIRC) |
+| `obbyirc/webpanel` | [ObsidianIRC/unrealircd-webpanel-2](https://github.com/ObsidianIRC/unrealircd-webpanel-2) |
 
 For Kubernetes / Helm, see [obby-helm](https://github.com/ObsidianIRC/obby-helm).
 

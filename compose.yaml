@@ -2,6 +2,7 @@
 #
 #   docker compose up -d                       # IRC + backend
 #   docker compose --profile frontend up -d    # + web client
+#   docker compose --profile panel up -d       # + admin webpanel
 #
 # All persistent state lives under /data/obby/ (override per-path with
 # the *_BIND env vars).  Drop your TLS cert into /data/obby/tls/
@@ -106,3 +107,32 @@ services:
       - traefik.http.routers.web.rule=Host(`${WEB_FQDN}`)
       - traefik.http.routers.web.tls=true
       - traefik.http.services.web.loadbalancer.server.port=80
+
+  obby-panel:
+    image: ${OBBY_PANEL_IMAGE:-obbyirc/webpanel:latest}
+    restart: unless-stopped
+    profiles: ["panel"]
+    depends_on:
+      obbyircd:
+        condition: service_healthy
+    expose:
+      - "8080"
+    volumes:
+      - ${OBBY_PANEL_DATA_BIND:-/data/obby/panel-data}:/app/data
+    environment:
+      PORT: "8080"
+      UNREAL_RPC_URL: ${UNREAL_RPC_URL:-ws://obbyircd:8600/}
+      UNREAL_RPC_USERNAME: ${UNREAL_RPC_USERNAME:-admin}
+      UNREAL_RPC_PASSWORD: ${RPC_PASSWORD}
+      USE_MOCK_DATA: "${PANEL_USE_MOCK_DATA:-false}"
+      JWT_SECRET: ${PANEL_JWT_SECRET}
+      WEBPANEL_ADMIN_USER: ${PANEL_ADMIN_USER:-admin}
+      WEBPANEL_ADMIN_PASSWORD: ${PANEL_ADMIN_PASSWORD}
+    env_file:
+      - path: .env
+        required: false
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.panel.rule=Host(`${PANEL_FQDN}`)
+      - traefik.http.routers.panel.tls=true
+      - traefik.http.services.panel.loadbalancer.server.port=8080
