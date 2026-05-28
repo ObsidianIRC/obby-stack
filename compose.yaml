@@ -135,4 +135,5 @@ services:
       - traefik.enable=true
       - traefik.http.routers.panel.rule=Host(`${PANEL_FQDN}`)
       - traefik.http.routers.panel.tls=true
+      - traefik.http.routers.panel.tls.certresolver=letsencrypt
       - traefik.http.services.panel.loadbalancer.server.port=8080
