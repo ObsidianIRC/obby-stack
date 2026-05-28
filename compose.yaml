@@ -10,7 +10,7 @@
 
 services:
   obbyircd:
-    image: ${OBBYIRCD_IMAGE:-obbyirc/obbyircd:sha-${OBBYIRCD_VERSION:-2536630}}
+    image: ${OBBYIRCD_IMAGE:-obbyirc/obbyircd:sha-${OBBYIRCD_VERSION:-9596226}}
     restart: unless-stopped
     expose:
       - "8080"
@@ -53,7 +53,7 @@ services:
       - traefik.http.services.obbyircd-ws.loadbalancer.server.port=8080
 
   obby-api:
-    image: ${OBBY_API_IMAGE:-obbyirc/obby-api:sha-${OBBY_API_VERSION:-e0ccb1b}}
+    image: ${OBBY_API_IMAGE:-obbyirc/obby-api:sha-${OBBY_API_VERSION:-65dc84c}}
     restart: unless-stopped
     depends_on:
       obbyircd:
