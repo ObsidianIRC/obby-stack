@@ -42,10 +42,6 @@ services:
       start_period: 30s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.obbyircd.rule=Host(`${IRC_FQDN}`)
-      - traefik.http.routers.obbyircd.tls=true
-      - traefik.http.routers.obbyircd.service=obbyircd
-      - traefik.http.services.obbyircd.loadbalancer.server.port=8080
       - traefik.http.routers.obbyircd-ws.rule=Host(`${API_FQDN}`) && HeaderRegexp(`Upgrade`,`websocket`)
       - traefik.http.routers.obbyircd-ws.tls=true
       - traefik.http.routers.obbyircd-ws.priority=100

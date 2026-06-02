@@ -52,7 +52,6 @@ class ComposeStack:
             "SSL_PORT": "6697",
             "WS_PORT": "8080",
             "API_FQDN": "api.test.local",
-            "IRC_FQDN": "irc.test.local",
             "WEB_FQDN": "chat.test.local",
             "FILEHOST_URL": "",
             "FILEHOST_PUBLIC_URL": "",
