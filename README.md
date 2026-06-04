@@ -8,12 +8,12 @@ from Dockerhub. The Dockerfiles live in their per-service repos:
 
 | Image | Source repo |
 |-------|-------------|
-| `obbyirc/obbyircd` | [ObsidianIRC/ObbyIRCd](https://github.com/ObsidianIRC/ObbyIRCd) |
-| `obbyirc/obby-api` | [ObsidianIRC/hosted-backend](https://github.com/ObsidianIRC/hosted-backend) |
-| `obbyirc/obby` | [ObsidianIRC/ObsidianIRC](https://github.com/ObsidianIRC/ObsidianIRC) |
-| `obbyirc/webpanel` | [ObsidianIRC/unrealircd-webpanel-2](https://github.com/ObsidianIRC/unrealircd-webpanel-2) |
+| `obbyworld/obbyircd` | [obbyworld/ObbyIRCd](https://github.com/obbyworld/ObbyIRCd) |
+| `obbyworld/obby-api` | [obbyworld/hosted-backend](https://github.com/obbyworld/hosted-backend) |
+| `obbyworld/obby` | [obbyworld/obby](https://github.com/obbyworld/obby) |
+| `obbyworld/webpanel` | [obbyworld/unrealircd-webpanel-2](https://github.com/obbyworld/unrealircd-webpanel-2) |
 
-For Kubernetes / Helm, see [obby-helm](https://github.com/ObsidianIRC/obby-helm).
+For Kubernetes / Helm, see [obby-helm](https://github.com/obbyworld/obby-helm).
 
 ## Quick start
 
