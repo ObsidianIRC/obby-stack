@@ -10,7 +10,8 @@
 
 services:
   obbyircd:
-    image: ${OBBYIRCD_IMAGE:-obbyworld/obbyircd:sha-${OBBYIRCD_VERSION:-9596226}}
+    # renovate: datasource=docker depName=obbyworld/obbyircd
+    image: ${OBBYIRCD_IMAGE:-obbyworld/obbyircd:${OBBYIRCD_VERSION:-0.1.0}}
     restart: unless-stopped
     expose:
       - "8080"
@@ -49,7 +50,8 @@ services:
       - traefik.http.services.obbyircd-ws.loadbalancer.server.port=8080
 
   obby-api:
-    image: ${OBBY_API_IMAGE:-obbyworld/obby-api:sha-${OBBY_API_VERSION:-65dc84c}}
+    # renovate: datasource=docker depName=obbyworld/obby-api
+    image: ${OBBY_API_IMAGE:-obbyworld/obby-api:${OBBY_API_VERSION:-0.1.0}}
     restart: unless-stopped
     depends_on:
       obbyircd:
@@ -90,7 +92,8 @@ services:
       - traefik.http.services.api.loadbalancer.server.port=8080
 
   obby:
-    image: ${OBBY_WEB_IMAGE:-obbyworld/obby:${OBBY_WEB_VERSION:-5e4181b3e51b4645b9b39e55ba10deb8f42e2793}}
+    # renovate: datasource=docker depName=obbyworld/obby
+    image: ${OBBY_WEB_IMAGE:-obbyworld/obby:${OBBY_WEB_VERSION:-0.3.2}}
     restart: unless-stopped
     profiles: ["frontend"]
     expose:
@@ -105,7 +108,8 @@ services:
       - traefik.http.services.web.loadbalancer.server.port=80
 
   obby-panel:
-    image: ${OBBY_PANEL_IMAGE:-obbyworld/webpanel:latest}
+    # renovate: datasource=docker depName=obbyworld/webpanel
+    image: ${OBBY_PANEL_IMAGE:-obbyworld/webpanel:${OBBY_PANEL_VERSION:-0.1.0}}
     restart: unless-stopped
     profiles: ["panel"]
     depends_on:
