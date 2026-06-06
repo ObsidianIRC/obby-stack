@@ -1,0 +1,39 @@
+name: Renovate
+
+on:
+  schedule:
+    # Daily 06:00 UTC; adjust cadence here.
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: Renovate log level
+        required: false
+        default: info
+        type: choice
+        options: [debug, info, warn]
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: renovatebot/github-action@v40
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+          RENOVATE_PLATFORM: github
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}

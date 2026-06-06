@@ -1,0 +1,40 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":semanticCommits"
+  ],
+  "labels": ["dependencies"],
+  "enabledManagers": ["github-actions", "custom.regex"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "obbyworld service image versions pinned as compose env defaults",
+      "managerFilePatterns": ["/(^|/)compose\\.ya?ml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+image:.*:-(?<currentValue>[^}\\n]+)\\}"
+      ],
+      "versioningTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "obbyworld service image versions documented in .env.example",
+      "managerFilePatterns": ["/(^|/)\\.env\\.example$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+# \\S+_VERSION=(?<currentValue>\\S+)"
+      ],
+      "versioningTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "First-party obbyworld images: one PR per service, never auto-merge",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["obbyworld/**"],
+      "automerge": false,
+      "commitMessageTopic": "{{depName}}",
+      "addLabels": ["obbyworld-image"]
+    }
+  ]
+}
