@@ -11,7 +11,7 @@
 services:
   obbyircd:
     # renovate: datasource=docker depName=obbyworld/obbyircd
-    image: ${OBBYIRCD_IMAGE:-obbyworld/obbyircd:${OBBYIRCD_VERSION:-0.1.0}}
+    image: ${OBBYIRCD_IMAGE:-obbyworld/obbyircd:${OBBYIRCD_VERSION:-latest}}
     restart: unless-stopped
     expose:
       - "8080"
@@ -93,7 +93,7 @@ services:
 
   obby:
     # renovate: datasource=docker depName=obbyworld/obby
-    image: ${OBBY_WEB_IMAGE:-obbyworld/obby:${OBBY_WEB_VERSION:-0.3.2}}
+    image: ${OBBY_WEB_IMAGE:-obbyworld/obby:${OBBY_WEB_VERSION:-latest}}
     restart: unless-stopped
     profiles: ["frontend"]
     expose:
