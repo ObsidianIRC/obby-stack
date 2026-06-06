@@ -30,7 +30,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: renovatebot/github-action@v40
+      - uses: renovatebot/github-action@v46.1.14
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
         env:
