@@ -5,10 +5,12 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "=== runner arch ==="; uname -m
-          docker run -d --name t -e WS_PORT=8080 -e SSL_PORT=6697 obbyworld/obbyircd:latest
+      - name: run obbyircd latest
+        run: |
+          uname -m
+          docker run -d --name obbycheck -e WS_PORT=8080 -e SSL_PORT=6697 obbyworld/obbyircd:latest
           sleep 25
-          echo "=== status ==="; docker inspect -f "{{.State.Status}} exit={{.State.ExitCode}}" t
-          echo "=== port 8080 ==="; docker exec t sh -c "nc -z 127.0.0.1 8080 && echo OPEN || echo CLOSED" || echo "container down"
-          echo "=== logs tail ==="; docker logs t 2>&1 | tail -40
+          docker inspect -f 'status={{.State.Status}} exit={{.State.ExitCode}}' obbycheck
+          docker exec obbycheck sh -c 'nc -z 127.0.0.1 8080 && echo PORT_OPEN || echo PORT_CLOSED' || echo CONTAINER_DOWN
+          echo "----- obbyircd logs -----"
+          docker logs obbycheck 2>&1 | tail -45
