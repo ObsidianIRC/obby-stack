@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: reproduce e2e obbyircd boot
+      - name: backtrace obbyircd config crash
         run: |
           uname -m
           ROOT=$(mktemp -d)
@@ -37,10 +37,23 @@ jobs:
           export CUSTOM_MODULES_BIND="$ROOT/custom-modules" SCRIPTS_BIND="$ROOT/scripts" VOICE_BRIDGE_BIND="$ROOT/voice-bridge"
           export OBBY_API_DATA_BIND="$ROOT/api-data" OBBY_API_IMAGES_BIND="$ROOT/api-images"
           export WS_PORT=8080 SSL_PORT=6697 API_FQDN=api.test.local
+          IMG=$(docker compose -f compose.yaml -f tests/e2e/compose.override.yaml config --images | head -1)
+          echo "IMG=$IMG"
           docker compose -f compose.yaml -f tests/e2e/compose.override.yaml up -d obbyircd || true
-          sleep 45
-          echo "===== PS ====="
-          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml ps -a obbyircd || true
-          echo "===== OBBYIRCD LOGS ====="
-          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml logs obbyircd 2>&1 | tail -70
-          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml down -v -t 5 || true
+          sleep 15
+          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml down -t 5 || true
+          echo "===== conf blocks present (headers only, no values) ====="
+          sudo grep -hoE '^[a-z!-]+ ' "$ROOT/conf"/*.conf 2>/dev/null | sort -u || true
+          echo "===== gdb backtrace of config-test ====="
+          sudo chmod -R a+rwX "$ROOT"
+          docker run --rm -u 0 \
+            -v "$ROOT/conf":/home/obbyircd/obby/conf \
+            -v "$ROOT/data":/home/obbyircd/obby/data \
+            -v "$ROOT/tls":/home/obbyircd/obby/tls \
+            -v "$ROOT/logs":/home/obbyircd/obby/logs \
+            --entrypoint sh "$IMG" -c '
+              apk add --no-cache gdb >/dev/null 2>&1 || true
+              cd /home/obbyircd/obby
+              chown -R obbyircd:obbyircd conf data tls logs 2>/dev/null || true
+              su-exec obbyircd sh -c "gdb -q -batch -ex run -ex bt -ex \"info registers rip\" -ex \"x/4i \$pc\" --args ./bin/obbyircd -c" 2>&1 | tail -55
+            '
