@@ -5,12 +5,42 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: run obbyircd latest
+      - uses: actions/checkout@v4
+      - name: reproduce e2e obbyircd boot
         run: |
           uname -m
-          docker run -d --name obbycheck -e WS_PORT=8080 -e SSL_PORT=6697 obbyworld/obbyircd:latest
-          sleep 25
-          docker inspect -f 'status={{.State.Status}} exit={{.State.ExitCode}}' obbycheck
-          docker exec obbycheck sh -c 'nc -z 127.0.0.1 8080 && echo PORT_OPEN || echo PORT_CLOSED' || echo CONTAINER_DOWN
-          echo "----- obbyircd logs -----"
-          docker logs obbycheck 2>&1 | tail -45
+          ROOT=$(mktemp -d)
+          for d in conf data logs tls custom-modules scripts voice-bridge api-data api-images; do mkdir -p "$ROOT/$d"; done
+          ENVF="$ROOT/test.env"
+          {
+            echo "SERVER_NAME=irc.test.local"
+            echo "NETWORK_NAME=ObbyE2E"
+            echo "ADMIN_EMAIL=test@test.local"
+            echo "MOTD_TEXT=test"
+            echo "OPER_NAME=admin"
+            echo "OPER_PASSWORD=$(openssl rand -hex 8)"
+            echo "SSL_PORT=6697"
+            echo "WS_PORT=8080"
+            echo "API_FQDN=api.test.local"
+            echo "WEB_FQDN=chat.test.local"
+            echo "JWT_SECRET=$(openssl rand -hex 32)"
+            echo "IRC_SERVER_KEY=$(openssl rand -hex 32)"
+            echo "VOICE_TURN_SECRET=$(openssl rand -hex 32)"
+            echo "VOICE_PUBLIC_IP=127.0.0.1"
+            echo "TURN_PORT=0"
+            echo "VOICE_TURN_REALM=test"
+            echo "VOICE_MAX_ROOM=5"
+            echo "UNREALIRCD_API_USERNAME=admin"
+          } > "$ENVF"
+          export E2E_ENV_FILE="$ENVF" COMPOSE_PROJECT_NAME=amd64e2e
+          export CONF_BIND="$ROOT/conf" DATA_BIND="$ROOT/data" LOGS_BIND="$ROOT/logs" TLS_BIND="$ROOT/tls"
+          export CUSTOM_MODULES_BIND="$ROOT/custom-modules" SCRIPTS_BIND="$ROOT/scripts" VOICE_BRIDGE_BIND="$ROOT/voice-bridge"
+          export OBBY_API_DATA_BIND="$ROOT/api-data" OBBY_API_IMAGES_BIND="$ROOT/api-images"
+          export WS_PORT=8080 SSL_PORT=6697 API_FQDN=api.test.local
+          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml up -d obbyircd || true
+          sleep 45
+          echo "===== PS ====="
+          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml ps -a obbyircd || true
+          echo "===== OBBYIRCD LOGS ====="
+          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml logs obbyircd 2>&1 | tail -70
+          docker compose -f compose.yaml -f tests/e2e/compose.override.yaml down -v -t 5 || true
