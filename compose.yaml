@@ -108,8 +108,8 @@ services:
       - traefik.http.services.web.loadbalancer.server.port=80
 
   obby-panel:
-    # renovate: datasource=docker depName=obbyworld/webpanel
-    image: ${OBBY_PANEL_IMAGE:-obbyworld/webpanel:${OBBY_PANEL_VERSION:-0.1.0}}
+    # renovate: datasource=docker depName=ghcr.io/valwareirc/unrealircd-webpanel-2
+    image: ${OBBY_PANEL_IMAGE:-ghcr.io/valwareirc/unrealircd-webpanel-2:${OBBY_PANEL_VERSION:-latest}}
     restart: unless-stopped
     profiles: ["panel"]
     depends_on:
