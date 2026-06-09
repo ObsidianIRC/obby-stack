@@ -15,6 +15,7 @@ services:
     restart: unless-stopped
     expose:
       - "8080"
+      - "${INVITE_PAGE_PORT:-8661}"
     ports:
       - "${SSL_HOST_PORT:-6697}:${SSL_PORT:-6697}"
     volumes:
@@ -32,6 +33,8 @@ services:
       VOICE_TURN_EXTERNAL_URLS: ${VOICE_TURN_EXTERNAL_URLS:-}
       VOICE_TURN_SHARED_SECRET: ${VOICE_TURN_SHARED_SECRET:-}
       VOICE_TURN_TTL: ${VOICE_TURN_TTL:-}
+      INVITE_PAGE_PORT: "${INVITE_PAGE_PORT:-8661}"
+      INVITE_BASE_URL: ${INVITE_BASE_URL:-}
     env_file:
       - path: .env
         required: false
@@ -48,6 +51,10 @@ services:
       - traefik.http.routers.obbyircd-ws.priority=100
       - traefik.http.routers.obbyircd-ws.service=obbyircd-ws
       - traefik.http.services.obbyircd-ws.loadbalancer.server.port=8080
+      - traefik.http.routers.obbyircd-invite.rule=Host(`${INVITE_FQDN}`)
+      - traefik.http.routers.obbyircd-invite.tls=true
+      - traefik.http.routers.obbyircd-invite.service=obbyircd-invite
+      - traefik.http.services.obbyircd-invite.loadbalancer.server.port=${INVITE_PAGE_PORT:-8661}
 
   obby-api:
     # renovate: datasource=docker depName=obbyworld/obby-api
