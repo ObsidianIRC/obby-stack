@@ -128,7 +128,7 @@ services:
       - ${OBBY_PANEL_DATA_BIND:-/data/obby/panel-data}:/app/data
     environment:
       PORT: "8080"
-      UNREAL_RPC_URL: ${UNREAL_RPC_URL:-ws://obbyircd:8080/}
+      UNREAL_RPC_URL: ${UNREAL_RPC_URL:-ws://obbyircd:8600/}
       UNREAL_RPC_USERNAME: ${UNREAL_RPC_USERNAME:-admin}
       UNREAL_RPC_PASSWORD: ${RPC_PASSWORD}
       USE_MOCK_DATA: "${PANEL_USE_MOCK_DATA:-false}"
