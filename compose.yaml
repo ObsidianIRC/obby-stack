@@ -115,8 +115,8 @@ services:
       - traefik.http.services.web.loadbalancer.server.port=80
 
   obby-panel:
-    # renovate: datasource=docker depName=ghcr.io/obbyworld/obby-webpanel
-    image: ${OBBY_PANEL_IMAGE:-ghcr.io/obbyworld/obby-webpanel:${OBBY_PANEL_VERSION:-latest}}
+    # renovate: datasource=docker depName=obbyworld/webpanel
+    image: ${OBBY_PANEL_IMAGE:-obbyworld/webpanel:${OBBY_PANEL_VERSION:-latest}}
     restart: unless-stopped
     profiles: ["panel"]
     depends_on:
