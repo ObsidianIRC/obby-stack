@@ -18,7 +18,9 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
+  issues: write
 
 jobs:
   renovate:
@@ -28,10 +30,9 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: renovatebot/github-action@v40
+      - uses: renovatebot/github-action@v46.1.14
         with:
-          token: ${{ secrets.RENOVATE_TOKEN }}
-          configurationFile: renovate.json
+          token: ${{ secrets.GITHUB_TOKEN }}
         env:
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_PLATFORM: github

@@ -6,7 +6,7 @@
     ":semanticCommits"
   ],
   "labels": ["dependencies"],
-  "enabledManagers": ["github-actions", "custom.regex"],
+  "enabledManagers": ["custom.regex"],
   "customManagers": [
     {
       "customType": "regex",
