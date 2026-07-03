@@ -65,6 +65,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.obby-edge.rule=Host(`${API_FQDN}`)
       - traefik.http.routers.obby-edge.tls=true
+      - traefik.http.routers.obby-edge.service=obby-edge
       - traefik.http.services.obby-edge.loadbalancer.server.port=80
 
   obby-api:
