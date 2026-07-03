@@ -1,0 +1,16 @@
+{
+	auto_https off
+	admin off
+}
+
+# One hostname (API_FQDN) for both surfaces; TLS is terminated upstream by
+# Coolify/Traefik, so this listens plain HTTP. WebSocket upgrades go to the
+# ircd, everything else to the API.
+:80 {
+	@websocket {
+		header Connection *Upgrade*
+		header Upgrade websocket
+	}
+	reverse_proxy @websocket {$OBBY_WS_UPSTREAM}
+	reverse_proxy {$OBBY_API_UPSTREAM}
+}

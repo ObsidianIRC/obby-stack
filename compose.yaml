@@ -46,15 +46,31 @@ services:
       start_period: 30s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.obbyircd-ws.rule=Host(`${API_FQDN}`) && HeaderRegexp(`Upgrade`,`websocket`)
-      - traefik.http.routers.obbyircd-ws.tls=true
-      - traefik.http.routers.obbyircd-ws.priority=100
-      - traefik.http.routers.obbyircd-ws.service=obbyircd-ws
-      - traefik.http.services.obbyircd-ws.loadbalancer.server.port=8080
       - traefik.http.routers.obbyircd-invite.rule=Host(`${INVITE_FQDN}`)
       - traefik.http.routers.obbyircd-invite.tls=true
       - traefik.http.routers.obbyircd-invite.service=obbyircd-invite
       - traefik.http.services.obbyircd-invite.loadbalancer.server.port=${INVITE_PAGE_PORT:-8661}
+
+  obby-proxy:
+    # renovate: datasource=docker depName=caddy
+    image: caddy:${CADDY_VERSION:-2.10-alpine}
+    restart: unless-stopped
+    depends_on:
+      obbyircd:
+        condition: service_healthy
+    environment:
+      OBBY_WS_UPSTREAM: "obbyircd:${WS_PORT:-8080}"
+      OBBY_API_UPSTREAM: "obby-api:8080"
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+    env_file:
+      - path: .env
+        required: false
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.obby-edge.rule=Host(`${API_FQDN}`)
+      - traefik.http.routers.obby-edge.tls=true
+      - traefik.http.services.obby-edge.loadbalancer.server.port=80
 
   obby-api:
     # renovate: datasource=docker depName=obbyworld/obby-api
@@ -92,11 +108,6 @@ services:
     env_file:
       - path: .env
         required: false
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.api.rule=Host(`${API_FQDN}`)
-      - traefik.http.routers.api.tls=true
-      - traefik.http.services.api.loadbalancer.server.port=8080
 
   obby:
     # renovate: datasource=docker depName=obbyworld/obby
