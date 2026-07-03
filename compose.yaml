@@ -58,14 +58,9 @@ services:
     depends_on:
       obbyircd:
         condition: service_healthy
-    environment:
-      OBBY_WS_UPSTREAM: "obbyircd:${WS_PORT:-8080}"
-      OBBY_API_UPSTREAM: "obby-api:8080"
-    volumes:
-      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
-    env_file:
-      - path: .env
-        required: false
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
     labels:
       - traefik.enable=true
       - traefik.http.routers.obby-edge.rule=Host(`${API_FQDN}`)
@@ -155,3 +150,19 @@ services:
       - traefik.http.routers.panel.tls=true
       - traefik.http.routers.panel.tls.certresolver=letsencrypt
       - traefik.http.services.panel.loadbalancer.server.port=8080
+
+configs:
+  caddyfile:
+    content: |
+      {
+      	auto_https off
+      	admin off
+      }
+      :80 {
+      	@websocket {
+      		header Connection *Upgrade*
+      		header Upgrade websocket
+      	}
+      	reverse_proxy @websocket obbyircd:${WS_PORT:-8080}
+      	reverse_proxy obby-api:8080
+      }
