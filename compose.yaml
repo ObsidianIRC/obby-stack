@@ -53,7 +53,7 @@ services:
 
   obby-proxy:
     # renovate: datasource=docker depName=caddy
-    image: caddy:${CADDY_VERSION:-2.10-alpine}
+    image: caddy:${CADDY_VERSION:-2.11-alpine}
     restart: unless-stopped
     depends_on:
       obbyircd:
