@@ -11,7 +11,7 @@
 services:
   obbyircd:
     # renovate: datasource=docker depName=obbyworld/obbyircd
-    image: ${OBBYIRCD_IMAGE:-obbyworld/obbyircd:${OBBYIRCD_VERSION:-v6.2.6.5}}
+    image: ${OBBYIRCD_IMAGE:-obbyworld/obbyircd:${OBBYIRCD_VERSION:-v6.2.6.6}}
     restart: unless-stopped
     expose:
       - "8080"
