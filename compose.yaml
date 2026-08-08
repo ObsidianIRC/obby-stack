@@ -70,7 +70,7 @@ services:
 
   obby-api:
     # renovate: datasource=docker depName=obbyworld/obby-api
-    image: ${OBBY_API_IMAGE:-obbyworld/obby-api:${OBBY_API_VERSION:-0.1.0}}
+    image: ${OBBY_API_IMAGE:-obbyworld/obby-api:${OBBY_API_VERSION:-0.1.1}}
     restart: unless-stopped
     depends_on:
       obbyircd:
